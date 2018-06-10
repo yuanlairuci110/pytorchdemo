@@ -1,3 +1,4 @@
+# Pytorch （变量）
 import torch
 from torch.autograd import Variable
 

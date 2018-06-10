@@ -1,4 +1,4 @@
-# Pytorch 基础
+# Pytorch 基础（张量）
 
 # 导入torch基本的函数
 import torch
