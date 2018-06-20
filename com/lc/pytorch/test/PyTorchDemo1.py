@@ -24,3 +24,9 @@ class Net(nn.Module):
 
 net = Net()
 print(net)
+
+params = list(net.parameters())
+print(len(params))
+
+for name,pars in net.named_parameters():
+    print(name,' : ',pars.size())
