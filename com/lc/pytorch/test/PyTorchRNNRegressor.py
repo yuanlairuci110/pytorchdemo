@@ -54,3 +54,48 @@ class RNN(nn.Module):
 
 rnn = RNN()
 print(rnn)
+
+# 优化器
+optimizer = torch.optim.Adam(rnn.parameters(), LR)
+loss_func = nn.MSELoss()
+
+# 要使用初始 hidden state, 可以设成 None
+h_state = None
+
+plt.figure(1, figsize=(12, 5))
+plt.ion()           # continuously plot
+
+for step in range(100):
+    start, end = step * np.pi, (step + 1) * np.pi  # time steps
+    # sin 预测 cos
+    steps = np.linspace(start, end, 10, dtype=np.float32)
+    x_np = np.sin(steps)
+    y_np = np.cos(steps)
+    # shape (batch, time_step, input_size)
+    x = torch.from_numpy(x_np[np.newaxis, :, np.newaxis])
+    y = torch.from_numpy(y_np[np.newaxis, :, np.newaxis])
+
+    # 打印一些信息
+    # if step == 0:
+    #     print(x_np)
+    #     print(x_np[np.newaxis, :, np.newaxis])
+
+    # rnn 对于每个 step 的 prediction, 还有最后一个 step 的 h_state
+    prediction, h_state = rnn(x, h_state)
+    # !!  下一步十分重要 !!
+    h_state = h_state.data  # 要把 h_state 重新包装一下才能放入下一个 iteration, 不然会报错
+
+    loss = loss_func(prediction, y)     # cross entropy loss
+    optimizer.zero_grad()               # clear gradients for this training step
+    loss.backward()                     # backpropagation, compute gradients
+    optimizer.step()                    # apply gradients
+
+    # plotting
+    plt.plot(steps, y_np.flatten(), 'r-')
+    plt.plot(steps, prediction.data.numpy().flatten(), 'b-')
+    plt.draw();
+    plt.pause(0.05)
+
+plt.ioff()
+plt.show()
+
