@@ -58,37 +58,56 @@ class RNN(nn.Module):
         return out
 
 
-rnn = RNN()
+# 保存LSTM循环神经网络
+def save():
+    rnn = RNN()
 
-print(rnn)
+    print(rnn)
 
-optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)
-loss_func = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)
+    loss_func = nn.CrossEntropyLoss()
 
-# 训练、测试和保存模型
-for epoch in range(EPOCH):
-    for step, (b_x, b_y) in enumerate(train_loader):
-        if step == 0:
-            print(b_x[0])
-            print(b_y[0])
-        b_x = b_x.view(-1, 28, 28)
-        output = rnn(b_x)
-        loss = loss_func(output,b_y)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+    # 训练和测试
+    for epoch in range(EPOCH):
+        for step, (b_x, b_y) in enumerate(train_loader):
+            if step == 0:
+                print(b_x[0])
+                print(b_y[0])
+            b_x = b_x.view(-1, 28, 28)
+            output = rnn(b_x)
+            loss = loss_func(output, b_y)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        if step % 50 == 0:
-            test_output = rnn(test_x)
-            pred_y = torch.max(test_output,1)[1].data.numpy().squeeze()
-            accuracy = float((pred_y == test_y).astype(int).sum())/float(test_y.size)
-            print('Epoch: ', epoch,' | step :',step, '| train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.2f' % accuracy)
+            if step % 50 == 0:
+                test_output = rnn(test_x)
+                pred_y = torch.max(test_output, 1)[1].data.numpy().squeeze()
+                accuracy = float((pred_y == test_y).astype(int).sum()) / float(test_y.size)
+                print('Epoch: ', epoch, ' | step :', step, '| train loss: %.4f' % loss.data.numpy(),
+                      '| test accuracy: %.2f' % accuracy)
 
-# 保存模型
-torch.save(rnn, 'rnn_lstm.pkl')
-torch.save(rnn.state_dict(), 'rnn_lstm_params.pkl')
+    # 保存模型
+    torch.save(rnn, 'rnn_lstm.pkl')
+    torch.save(rnn.state_dict(), 'rnn_lstm_params.pkl')
 
-test_output = rnn(test_x[:10].view(-1, 28, 28))
-pred_y = torch.max(test_output,1)[1].data.numpy().squeeze()
-print(pred_y,"预测值")
-print(test_y[:10],"实际值")
+# 通过网络模型启动
+def restore_net():
+    rnn2 = torch.load('rnn_lstm.pkl')
+    test_output = rnn2(test_x[:100].view(-1, 28, 28))
+    pred_y = torch.max(test_output, 1)[1].data.numpy().squeeze()
+    print(pred_y, '预测值')
+    print(test_y[:100], '实际值')
+
+def restore_params():
+    rnn3 = RNN()
+    rnn3.load_state_dict(torch.load('rnn_lstm_params.pkl'))
+    test_output = rnn3(test_x[101:200].view(-1, 28, 28))
+    pred_y = torch.max(test_output, 1)[1].data.numpy().squeeze()
+    print(pred_y, '预测值')
+    print(test_y[101:200], '实际值')
+# save()
+
+restore_net()
+
+restore_params()
