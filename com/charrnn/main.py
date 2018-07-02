@@ -85,7 +85,8 @@ def train():
             loss = criterion(output, target.view(-1))
             loss.backward()
             optimizer.step()
-            if ii %100 == 0:
+            if ii % 200 == 0:
+                print("\nii : ",ii,"保存模型")
                 torch.save(model, '%s_%s.pkl' % (opt.model_prefix, epoch))
                 torch.save(model.state_dict(), '%s_%s_params.pkl' % (opt.model_prefix, epoch))
 
@@ -94,4 +95,8 @@ def train():
 
 
 if __name__ == '__main__':
+
+    # 训练
     train()
+
+
