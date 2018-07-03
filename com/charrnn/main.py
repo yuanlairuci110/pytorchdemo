@@ -6,7 +6,7 @@ from torch.autograd import Variable
 import torch.utils.data
 from com.charrnn.model import PoetryModel
 import tqdm
-
+import os
 
 # 定义超参数类
 class Config(object):
@@ -18,7 +18,7 @@ class Config(object):
     lr = 1e-3
     weight_decay = 1e-4
     use_gpu = True
-    epoch = 1
+    epoch = 20
     batch_size = 128
     maxlen = 125  # 超过这个长度的之后字被丢弃，小于这个长度的在前面补空格
     plot_every = 20  # 每20个batch 可视化一次
@@ -71,6 +71,11 @@ def train():
     # 模型定义
     model = PoetryModel(len(word2ix), 128, 256)
 
+    # 如果存在模型 则加载对应的参数
+    if os.path.exists('./checkpoints/tang_params.pkl'):
+        print("存在")
+        model.load_state_dict(torch.load('./checkpoints/tang_params.pkl'))
+
     # 优化器
     optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr)
     criterion = nn.CrossEntropyLoss()
@@ -85,10 +90,10 @@ def train():
             loss = criterion(output, target.view(-1))
             loss.backward()
             optimizer.step()
-            if ii % 200 == 0:
-                print("\nii : ",ii,"保存模型")
-                torch.save(model, '%s_%s.pkl' % (opt.model_prefix, epoch))
-                torch.save(model.state_dict(), '%s_%s_params.pkl' % (opt.model_prefix, epoch))
+            # if ii % 200 == 0:
+            #     print("\nii : ",ii,"保存模型")
+            #     torch.save(model, '%s_%s.pkl' % (opt.model_prefix, epoch))
+            #     torch.save(model.state_dict(), '%s_%s_params.pkl' % (opt.model_prefix, epoch))
 
         torch.save(model, '%s_%s.pkl' % (opt.model_prefix, epoch))
         torch.save(model.state_dict(), '%s_%s_params.pkl' % (opt.model_prefix, epoch))
@@ -98,5 +103,4 @@ if __name__ == '__main__':
 
     # 训练
     train()
-
 
