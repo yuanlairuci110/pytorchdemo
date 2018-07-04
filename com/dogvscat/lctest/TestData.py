@@ -1,8 +1,8 @@
 from com.dogvscat.config import opt
-from com.dogvscat.data.DogCatData import DogCat
+from com.dogvscat.data.DogCatData import TrainDogCat
 from torch.utils.data import DataLoader
 
-train_dataset = DogCat(opt.lc_data_root)
+train_dataset = TrainDogCat(opt.train_data_root)
 trainloader = DataLoader(train_dataset, batch_size=opt.batch_size, shuffle=True, num_workers=opt.num_workers)
 
 if __name__ == '__main__':

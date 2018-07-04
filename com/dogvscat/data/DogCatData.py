@@ -5,10 +5,15 @@ import torch
 from torch.utils import data
 from torchvision import transforms as T
 
-class DogCat(data.Dataset):
-    def __init__(self, root):
-        imgs = os.listdir(root)
-        self.imgs = [os.path.join(root, img) for img in imgs]
+
+class TrainDogCat(data.Dataset):
+    def __init__(self, root, train=True):
+        imgs = [os.path.join(root, img) for img in os.listdir(root)]
+        imgs_num = len(imgs)
+        if train:
+            self.imgs = imgs[:int(0.7 * imgs_num)]
+        else:
+            self.imgs = imgs[int(0.7 * imgs_num):]
         self.transforms = T.Compose([
             T.Resize(224),
             T.CenterCrop(224),
