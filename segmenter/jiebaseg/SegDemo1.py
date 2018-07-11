@@ -1,6 +1,7 @@
 # encoding=utf-8
 import jieba
 import jieba.analyse as analyse
+import jieba.posseg as pseg
 
 # ==========================分词=====================
 
@@ -68,3 +69,10 @@ jieba.add_word(word, freq=100, tag='get')
 print (' '.join(jieba.analyse.extract_tags(text, topK=100, withWeight=False, allowPOS=('get','n','ns','vn'))))
 
 #==============基于 TextRank 算法的关键词抽取============
+
+
+#==============词性标注====================
+words = pseg.cut("我爱北京天安门")
+for word,flag in words:
+    print(word +" "+flag)
+
